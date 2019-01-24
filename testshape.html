@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html>
+<head lang="en">
+ <meta charset="UTF-8">
+</head>
+<body>
+ <canvas id="main" width="800" height="500" style="border:1px solid"></canvas>
+
+ <script>
+      var objectArray = [{ left:10, top:10, width:50, height:50 }];
+      var canvas = document.getElementById("main");
+      var ctx = canvas.getContext("2d");
+
+      var rectangle = new Path2D();
+      rectangle.rect(objectArray[0].left,objectArray[0].top,objectArray[0].width,objectArray[0].height);
+      ctx.strokeStyle = 'rgba(255, 0, 0, 0.5)';
+      ctx.fillStyle = 'rgba(255, 0, 0, 0.2)';
+      ctx.fill(rectangle);
+      ctx.stroke(rectangle);
+ </script>
+</body>
+</html>

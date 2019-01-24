@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html>
+<head lang="en">
+ <meta charset="UTF-8">
+</head>
+<body>
+ <canvas id="main" width="800" height="500" style="border:1px solid"></canvas>
+
+ <script>
+
+
+
+  function CDraw( canvas )
+  {
+   var ret = {
+    ctx:canvas.getContext("2d"),
+    bb: canvas.getBoundingClientRect(),
+    arrBox:[],
+    startX:0,
+    startY:0,
+    isDrag:false,
+    iBoxIndex:0,
+
+
+
+    AddBox: function( iLeft, iTop, iWidth, iHeight ){
+     var clsBox = { left:iLeft, top:iTop, width:iWidth, height:iHeight, lineTo:-1 };
+     var iBoxCount = this.arrBox.length;
+
+     this.arrBox[iBoxCount] = clsBox;
+
+     this.DrawBox();
+    },
+
+
+
+    AddLine: function( iStart, iEnd ){
+
+     var iCount = this.arrBox.length;
+
+     if( iStart < 0 || iStart >= iCount ) return;
+     if( iEnd < 0 || iEnd >= iCount ) return;
+
+     this.arrBox[iStart].lineTo = iEnd;
+
+     this.DrawBox();
+    },
+
+
+
+    MoveBox: function( iBoxIndex, iX, iY ){
+     this.arrBox[iBoxIndex].left = this.arrBox[iBoxIndex].left + iX;
+     this.arrBox[iBoxIndex].top = this.arrBox[iBoxIndex].top + iY;
+
+     this.DrawBox();
+    },
+
+
+
+    DrawBox: function(){
+     var iBoxCount = this.arrBox.length;
+
+     this.ctx.clearRect( 0, 0, canvas.width, canvas.height );
+
+
+
+     for( var i = 0; i < iBoxCount; ++i )
+     {
+      var clsBox = this.arrBox[i];
+      this.ctx.fillRect( clsBox.left, clsBox.top, clsBox.width, clsBox.height );
+
+      if( clsBox.lineTo >= 0 )
+      {
+       var clsLineBox = this.arrBox[clsBox.lineTo];
+
+       this.ctx.beginPath();
+
+       if( ( clsBox.left + clsBox.width ) < clsLineBox.left )
+       {
+        this.ctx.moveTo( clsBox.left + clsBox.width, clsBox.top + clsBox.height / 2 );
+        this.ctx.lineTo( clsLineBox.left, clsLineBox.top + clsLineBox.height / 2 );
+       }
+       else if( ( clsLineBox.left + clsLineBox.width ) < clsBox.left )
+       {
+        this.ctx.moveTo( clsLineBox.left + clsLineBox.width, clsLineBox.top + clsLineBox.height / 2 );
+        this.ctx.lineTo( clsBox.left, clsBox.top + clsBox.height / 2 );
+       }
+       else if( ( clsBox.top + clsBox.height ) < clsLineBox.top )
+       {
+        this.ctx.moveTo( clsBox.left + clsBox.width / 2, clsBox.top + clsBox.height );
+        this.ctx.lineTo( clsLineBox.left + clsLineBox.width / 2, clsLineBox.top );
+       }
+       else
+       {
+        this.ctx.moveTo( clsLineBox.left + clsLineBox.width / 2, clsLineBox.top + clsLineBox.height );
+        this.ctx.lineTo( clsBox.left + clsBox.width / 2, clsBox.top );
+       }
+
+      this.ctx.stroke();
+       this.ctx.closePath();
+     }
+     }
+    },
+
+
+
+    mousedown: function(e){
+     this.startX = e.clientX - this.bb.left;
+     this.startY = e.clientY - this.bb.top;
+
+     var iBoxCount = this.arrBox.length;
+
+
+
+     for( var i = 0; i < iBoxCount; ++i )
+     {
+      var clsBox = this.arrBox[i];
+
+      if( this.startX > clsBox.left && this.startX < ( clsBox.left + clsBox.width ) && this.startY > clsBox.top && this.startY < ( clsBox.top + clsBox.height ) )
+      {
+       this.isDrag = true;
+       this.iBoxIndex = i;
+       break;
+      }
+     }
+    },
+
+
+
+    mousemove: function(e){
+     if( this.isDrag )
+     {
+      this.MoveBox( this.iBoxIndex, e.clientX - this.bb.left - this.startX, e.clientY - this.bb.top - this.startY );
+      this.startX = e.clientX - this.bb.left;
+      this.startY = e.clientY - this.bb.top;
+     }
+    },
+
+
+
+    mouseup: function(e){
+     if( this.isDrag )
+     {
+      this.MoveBox( this.iBoxIndex, e.clientX - this.bb.left - this.startX, e.clientY - this.bb.top - this.startY );
+      this.isDrag = false;
+     }
+    }
+   };
+
+
+
+   canvas.addEventListener( "mousemove", function(e){ ret.mousemove(e); } );
+   canvas.addEventListener( "mousedown", function(e){ ret.mousedown(e); } );
+   canvas.addEventListener( "mouseup", function(e){ ret.mouseup(e); } );
+
+
+
+   return ret;
+  }
+
+
+
+  var clsDraw = new CDraw( document.getElementById("main") );
+
+
+
+  // 네모박스 2개를 생성한다.
+
+  clsDraw.AddBox( 20, 20, 50, 50 );
+  clsDraw.AddBox( 200, 200, 50, 50 );
+  clsDraw.AddBox( 300, 300, 50, 50 );
+  clsDraw.AddBox( 100, 100, 50, 50 );
+  clsDraw.AddBox( 400, 400, 50, 50 );
+
+  // 네모박스 2개에 라인을 연결한다.
+  clsDraw.AddLine( 0, 1 );
+  clsDraw.AddLine( 1, 2 );
+  clsDraw.AddLine( 2, 3 );
+  clsDraw.AddLine( 1, 4 );
+
+ </script>
+</body>
+</html>
