@@ -8,17 +8,69 @@
   <script src="https://code.jquery.com/jquery-1.12.4.min.js" integrity="sha256-ZosEbRLbNQzLpnKIkEdrPv7lOy9C27hHQ+Xp8a4MxAQ=" crossorigin="anonymous"></script>
   <script src="./script/flowChart.js" charset="utf-8"></script>
   <script type="text/javascript">
+  var flowChart =  null;
     $(document).ready(function() {
-        var flowChart = new FlowChart( document.getElementById("main") );
+        flowChart = new FlowChart( document.getElementById("main") );
 
-        flowChart.AddShape(20, 20, 50, 50, 'TASK1');
-        flowChart.AddShape(20, 120, 50, 50, 'TASK2');
-        flowChart.AddShape(20, 220, 50, 50, 'TASK3');
+        flowChart.AddShape(20, 20, 150, 100, 'TASK1');
+        flowChart.AddShape(20, 180, 150, 100, 'TASK2');
+        //flowChart.AddShape(20, 350, 150, 100, 'TASK3');
+
+        flowChart.AddLine( 0, 1 );
+        //flowChart.AddLine( 1, 2 );
     });
+
+    function addTask(){
+      var iLeft = Number($('#left').val());
+      var iTop = Number($('#top').val());
+      var iWidth = Number($('#width').val());
+      var iHeight = Number($('#height').val());
+      var iTask = $('#task').val();
+      flowChart.AddShape(iLeft, iTop, iWidth, iHeight, iTask);
+    }
+
+    function addLine(){
+      var iStart = Number($('#start').val());
+      var iEnd = Number($('#end').val());
+      flowChart.AddLine(iStart, iEnd);
+    }
+
+    function removeTask(){
+      flowChart.removeShape();
+    }
+
+    function setMessage(){
+      flowChart.setMessage($('#message').val());
+    }
   </script>
 </head>
 
 <body>
+  <div id='toolbar'>
+    <select name="" id="" size="5">
+      <option value="Connection">연결선</option>
+      <option value="QuestionNode">질문</option>
+      <option value="ResponseNode">메세지응답</option>
+      <option value="FormInputNode">양식입력</option>
+    </select>
+  </div>
+  left,&nbsp;top,&nbsp;width,&nbsp;height&nbsp;<input id='left' type='text' style='width:40px'>
+  <input id='top' type='text' style='width:40px'>
+  <input id='width' type='text' style='width:40px'>
+  <input id='height' type='text' style='width:40px'>
+  <select id='task'>
+    <option value='TASK1'>TASK1</option>
+    <option value='TASK2'>TASK2</option>
+    <option value='TASK3'>TASK3</option>
+  </select>
+  <button onclick='addTask()'>task add</button>
+  <br>
+  <input id='start' type='text' style='width:40px'>
+  ~
+  <input id='end' type='text'style='width:40px'>
+  <button onclick='addLine()'>line add</button><br>
+  <button onclick='removeTask()'>remove add</button><br>
+  <input type="text" id='message' style='width:300px' ><button onclick='setMessage()'>setText</button><br>
   <canvas id="main" width="800" height="500" style="border:1px solid"></canvas>
 </body>
 
