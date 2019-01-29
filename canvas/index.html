@@ -9,15 +9,39 @@
   <script src="./script/flowChart.js" charset="utf-8"></script>
   <script type="text/javascript">
   var flowChart =  null;
+  var flowChart2 =  null;
+  var data = [];
     $(document).ready(function() {
         flowChart = new FlowChart( document.getElementById("main") );
 
-        flowChart.AddShape(20, 20, 150, 100, 'TASK1');
-        flowChart.AddShape(20, 180, 150, 100, 'TASK2');
-        flowChart.AddShape(20, 350, 150, 100, 'TASK3');
+        //flowChart.AddShape(left, top, width, height, 'shapeType' ,'id', clickFunction);
+        flowChart.AddShape(20, 20, 150, 100, 'TASK1' ,'aaa', function(src){
+          $('#nodeId').val(src.id);
+          $('#nodeType').val(src.type);
+          $('#nodeMessage').val(src.message);
+        });
+        flowChart.AddShape(200, 180, 150, 100, 'TASK2','bbb', function(src){
+          $('#nodeId').val(src.id);
+          $('#nodeType').val(src.type);
+          $('#nodeMessage').val(src.message);
+        });
+        flowChart.AddShape(390, 250, 150, 100, 'TASK3','ccc', function(src){
+          $('#nodeId').val(src.id);
+          $('#nodeType').val(src.type);
+          $('#nodeMessage').val(src.message);
+        });
+        flowChart.AddShape(580, 350, 150, 100, 'TASK2','ddd', function(src){
+          $('#nodeId').val(src.id);
+          $('#nodeType').val(src.type);
+          $('#nodeMessage').val(src.message);
+        });
 
         flowChart.AddLine( 0, 1 );
-        //flowChart.AddLine( 1, 2 );
+        flowChart.AddLine( 1, 2 );
+        flowChart.AddLine( 2, 3 );
+
+        flowChart2 = new FlowChart( document.getElementById("main2") );
+
     });
 
     function addTask(){
@@ -42,6 +66,14 @@
     function setMessage(){
       flowChart.setMessage($('#message').val());
     }
+
+    function saveData(){
+      data = flowChart.getData();
+    }
+
+    function loadData(){
+      flowChart2.loadData(data);
+    }
   </script>
 </head>
 
@@ -54,10 +86,11 @@
       <option value="FormInputNode">양식입력</option>
     </select>
   </div>
-  left,&nbsp;top,&nbsp;width,&nbsp;height&nbsp;<input id='left' type='text' style='width:40px'>
-  <input id='top' type='text' style='width:40px'>
-  <input id='width' type='text' style='width:40px'>
-  <input id='height' type='text' style='width:40px'>
+  left,&nbsp;top,&nbsp;width,&nbsp;height&nbsp;
+  <input id='left' type='text' style='width:40px' value='0'>
+  <input id='top' type='text' style='width:40px' value='0'>
+  <input id='width' type='text' style='width:40px' value='150'>
+  <input id='height' type='text' style='width:40px' value='100'>
   <select id='task'>
     <option value='TASK1'>TASK1</option>
     <option value='TASK2'>TASK2</option>
@@ -71,7 +104,23 @@
   <button onclick='addLine()'>line add</button><br>
   <button onclick='removeTask()'>remove add</button><br>
   <input type="text" id='message' style='width:300px' ><button onclick='setMessage()'>setText</button><br>
-  <canvas id="main" width="800" height="500" style="border:1px solid"></canvas>
+  <button onclick='saveData()'>saveData</button><br>
+  <button onclick='loadData()'>loadData</button><br>
+  <table>
+    <tr>
+      <td><canvas id="main" width="1000" height="500" style="border:1px solid"></canvas></td>
+      <td style="vertical-align: top">
+        <table>
+          <tr><td colspan="2"><h2>질문유형</h2></td></tr>
+          <tr><td>ID</td><td><input type="text" id="nodeId" style="width:400px"></td></tr>
+          <tr><td>업무분류</td><td><input type="text" id='nodeType' style="width:400px"></td></tr>
+          <tr><td>질문메세지</td><td><input type="text" id='nodeMessage' style="width:400px"></td></tr>
+          <tr><td>확인유도질문</td><td><input type="text" style="width:400px"></td></tr>
+        </table>
+      </td>
+    </tr>
+  </table>
+  <canvas id="main2" width="1000" height="500" style="border:1px solid"></canvas>
 </body>
 
 </html>

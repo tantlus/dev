@@ -6,13 +6,24 @@ function FlowChart(canvas) {
     startX: 0,
     startY: 0,
     isDrag: false,
-    shapeIndex: 0,
+    shapeIndex: undefined,
 
     getData: function(){
-      return shapes;
+      return this.shapes;
     },
 
-    AddShape: function(iLeft, iTop, iWidth, iHeight, shapeType, id) {
+    loadData: function(data){
+      this.shapes = data;
+      this.DrawCanvas();
+    },
+
+    getIndexFromId: function(id){
+      for (var i = 0; i < this.shapes.length; i++) {
+        if(this.shapes[i].id == id) return i;
+      }
+    },
+
+    AddShape: function(iLeft, iTop, iWidth, iHeight, shapeType, id , clickEventFn) {
       var info = {
         left: iLeft,
         top: iTop,
@@ -21,7 +32,8 @@ function FlowChart(canvas) {
         type: shapeType,
         id: '',
         lineTo: [],
-        message: ''
+        message: '',
+        clickFunc:function(param){}
       };
 
       if (id == undefined || id == '') {
@@ -29,6 +41,8 @@ function FlowChart(canvas) {
       } else {
         info.id = id;
       }
+
+      if(clickEventFn != undefined ) info.clickFunc = clickEventFn;
 
 
       this.shapes[this.shapes.length] = info;
@@ -42,16 +56,19 @@ function FlowChart(canvas) {
     },
 
     removeShape: function() {
+      if(this.shapeIndex == undefined) return;
       var oshapes = this.shapes;
-      for (var i = 0; i < oshapes.length; i++) {
+      for (var i = oshapes.length-1; 0 <= i; i--) {
         var lines = oshapes[i].lineTo;
-        for (var j = lines; j < lines.length; i++) {
-          if (oshapes[i].lineTo[j] == this.shapeIndex) {
-            oshapes[i].lineTo[j].splice(j, 1);
+        for (var j = lines.length-1 ; 0 <= j ; j--) {
+          var idx = this.getIndexFromId(oshapes[i].lineTo[j]);
+          if (idx == this.shapeIndex) {
+            oshapes[i].lineTo.splice(j, 1);
           }
         }
       }
       this.shapes.splice(this.shapeIndex, 1);
+      this.shapeIndex = undefined;
 
       this.DrawCanvas();
     },
@@ -112,11 +129,7 @@ function FlowChart(canvas) {
       this.ctx.fillText(messageSubstr, shape.left + 2, shape.top + 50, shape.width - 4);
     },
 
-    getIndexFromId: function(id){
-      for (var i = 0; i < this.shapes.length; i++) {
-        if(this.shapes[i].id == id) return i;
-      }
-    },
+
 
     drawLine: function(shape) {
       var lines = shape.lineTo;
@@ -241,6 +254,8 @@ function FlowChart(canvas) {
       for (var i = 0; i < shapeCount; ++i) {
         var shape = this.shapes[i];
 
+        console.log(i+','+shape.left +','+shape.width);
+
         if (this.startX > shape.left && this.startX < (shape.left + shape.width) && this.startY > shape.top && this.startY < (shape.top + shape.height)) {
           this.isDrag = true;
           this.shapeIndex = i;
@@ -261,12 +276,14 @@ function FlowChart(canvas) {
     },
 
     mouseup: function(e) {
+      var shape = this.shapes[this.shapeIndex];
       if (this.isDrag) {
         this.MoveBox(this.shapeIndex, e.clientX - this.canvasBound.left - this.startX, e.clientY - this.canvasBound.top - this.startY);
-        var shape = this.shapes[this.shapeIndex];
+
         this.drawfocusShape(shape);
         this.isDrag = false;
       }
+      if(shape.clickFunc != undefined) shape.clickFunc(shape);
     }
   };
 
